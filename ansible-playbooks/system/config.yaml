@@ -1,0 +1,30 @@
+- name: Initial system configuration
+  hosts: servers
+  become: true
+
+  vars:
+    server_hostname: razvans-laboratory
+    server_timezone: Europe/Bucharest
+    server_locale: en_US.UTF-8
+
+  tasks:
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: "{{ server_hostname }}"
+
+    - name: Set timezone
+      community.general.timezone:
+        name: "{{ server_timezone }}"
+    
+    - name: Generate locale
+      community.general.locale_gen:
+        name: "{{ server_locale }}"
+        state: present
+
+    - name: Set default system locale
+      ansible.builtin.lineinfile:
+        path: /etc/default/locale
+        regexp: '^LANG='
+        line: "LANG={{ server_locale }}"
+        create: true
+        mode: "0644"
