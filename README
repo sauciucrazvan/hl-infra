@@ -1,0 +1,4 @@
+Infrastructure for my home servers
+-----------------------------------------------
+
+A version-controlled, fully reproducible home lab. This repository holds the playbooks, roles, inventory, and documentation used to automate server provisioning, storage, networking, DNS, reverse proxying, monitoring, backups, and self-hosted services, with the goal of treating every machine as disposable.
