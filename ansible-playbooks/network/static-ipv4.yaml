@@ -1,0 +1,44 @@
+- name: Configure static IPv4
+  hosts: servers
+  become: true
+  gather_facts: true
+
+  vars:
+    net_interface: "{{ ansible_facts['default_ipv4']['interface'] }}"
+    net_type: wifis   # use "ethernets" if you have a cable
+    net_address: 192.168.1.146/24
+    net_gateway: "{{ ansible_facts['default_ipv4']['gateway'] }}"
+    net_dns:
+      - 1.1.1.1
+      - 9.9.9.9
+
+  tasks:
+    - name: Write static IPv4 overlay
+      ansible.builtin.copy:
+        dest: /etc/netplan/99-static.yaml
+        owner: root
+        group: root
+        mode: "0600"
+        content: |
+          network:
+            version: 2
+            {{ net_type }}:
+              {{ net_interface }}:
+                dhcp4: false
+                addresses:
+                  - {{ net_address }}
+                routes:
+                  - to: default
+                    via: {{ net_gateway }}
+                nameservers:
+                  addresses: {{ net_dns }}
+      register: netplan_file
+
+    - name: Validate netplan config
+      ansible.builtin.command: netplan generate
+      changed_when: false
+      when: netplan_file.changed
+
+    - name: Apply netplan
+      ansible.builtin.command: netplan apply
+      when: netplan_file.changed
