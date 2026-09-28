@@ -1,0 +1,5 @@
+- name: Ping pong!
+  hosts: servers
+  tasks:
+    - name: Test the connection
+      ansible.builtin.ping:
